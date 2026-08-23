@@ -1,0 +1,81 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  RESIDENT
+  ADMIN
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum Status {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(RESIDENT)
+  flatNumber   String?
+  createdAt    DateTime @default(now())
+
+  complaints            Complaint[]             @relation("ResidentComplaints")
+  statusChanges         ComplaintStatusHistory[] @relation("ChangedByUser")
+  notices               Notice[]                @relation("PostedByAdmin")
+}
+
+model Complaint {
+  id          String    @id @default(cuid())
+  residentId  String
+  category    String
+  description String
+  photoUrl    String?
+  priority    Priority  @default(MEDIUM)
+  status      Status    @default(OPEN)
+  createdAt   DateTime  @default(now())
+  resolvedAt  DateTime?
+
+  resident       User                     @relation("ResidentComplaints", fields: [residentId], references: [id])
+  statusHistory  ComplaintStatusHistory[] @relation("ComplaintHistory")
+}
+
+model ComplaintStatusHistory {
+  id          String   @id @default(cuid())
+  complaintId String
+  oldStatus   Status?
+  newStatus   Status
+  note        String?
+  changedBy   String
+  changedAt   DateTime @default(now())
+
+  complaint Complaint @relation("ComplaintHistory", fields: [complaintId], references: [id])
+  user      User      @relation("ChangedByUser", fields: [changedBy], references: [id])
+}
+
+model Notice {
+  id          String   @id @default(cuid())
+  title       String
+  body        String
+  isImportant Boolean  @default(false)
+  postedBy    String
+  createdAt   DateTime @default(now())
+
+  admin User @relation("PostedByAdmin", fields: [postedBy], references: [id])
+}
