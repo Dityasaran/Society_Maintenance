@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
       data: { name: name.trim(), email: email.toLowerCase().trim(), passwordHash, role: 'RESIDENT', flatNumber: flatNumber.trim() },
     });
 
-    const token = signToken({ userId: user.id, email: user.email, role: user.role, name: user.name });
+    const token = await signToken({ userId: user.id, email: user.email, role: user.role, name: user.name });
 
     const response = NextResponse.json(
       { user: { id: user.id, name: user.name, email: user.email, role: user.role, flatNumber: user.flatNumber } },

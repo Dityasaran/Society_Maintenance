@@ -43,3 +43,8 @@ next-env.d.ts
 # local uploads
 /public/uploads/
 
+# agent documentation
+AGENTS.md
+CLAUDE.md
+
+

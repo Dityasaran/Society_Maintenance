@@ -12,7 +12,7 @@ const PUBLIC_PATHS = [
   '/uploads',
 ];
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Allow public paths
@@ -26,7 +26,9 @@ export function middleware(request: NextRequest) {
   }
 
   const token = request.cookies.get(COOKIE_NAME)?.value;
-  const payload = token ? verifyToken(token) : null;
+  const payload = token ? await verifyToken(token) : null;
+
+
 
   // Not authenticated
   if (!payload) {

@@ -5,7 +5,7 @@ import { verifyToken, COOKIE_NAME } from '@/lib/auth';
 export default async function Home() {
   const cookieStore = await cookies();
   const token = cookieStore.get(COOKIE_NAME)?.value;
-  const payload = token ? verifyToken(token) : null;
+  const payload = token ? await verifyToken(token) : null;
 
   if (payload) {
     if (payload.role === 'ADMIN') {
